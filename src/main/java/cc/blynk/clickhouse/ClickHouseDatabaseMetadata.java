@@ -1,5 +1,6 @@
 package cc.blynk.clickhouse;
 
+import cc.blynk.clickhouse.domain.ClickHouseDataType;
 import cc.blynk.clickhouse.response.ClickHouseColumnInfo;
 import cc.blynk.clickhouse.response.ClickHouseResultBuilder;
 import cc.blynk.clickhouse.util.ClickHouseVersionNumberUtil;
@@ -714,17 +715,7 @@ public final class ClickHouseDatabaseMetadata implements DatabaseMetaData {
          REF_GENERATION String => specifies how values in SELF_REFERENCING_COL_NAME
          are created. Values are "SYSTEM", "USER", "DERIVED". (may be null)
          */
-        String sql = "select " +
-                "database, name, engine " +
-                "from system.tables " +
-                "where 1 = 1";
-        if (schemaPattern != null) {
-            sql += " and database like '" + schemaPattern + "'";
-        }
-        if (tableNamePattern != null) {
-            sql += " and name like '" + tableNamePattern + "'";
-        }
-        sql += " order by database, name";
+        String sql = "show tables";
         ResultSet result = request(sql);
 
         ClickHouseResultBuilder builder = ClickHouseResultBuilder.builder(10);
@@ -737,8 +728,10 @@ public final class ClickHouseDatabaseMetadata implements DatabaseMetaData {
         while (result.next()) {
             List<String> row = new ArrayList<>();
             row.add(DEFAULT_CAT);
+            row.add(DEFAULT_CAT);
             row.add(result.getString(1));
-            row.add(result.getString(2));
+            String type = "TABLE";
+            /*
             String type, e = result.getString(3).intern();
             if (e == "View" || e == "MaterializedView" || e == "Merge" || e == "Distributed" || e == "Null") {
                 type = "VIEW"; // some kind of view
@@ -747,8 +740,10 @@ public final class ClickHouseDatabaseMetadata implements DatabaseMetaData {
             } else {
                 type = "TABLE";
             }
+             */
             row.add(type);
-            for (int i = 3; i < 9; i++) {
+            row.add(result.getString(2));
+            for (int i = 4; i < 9; i++) {
                 row.add(null);
             }
             if (typeList == null || typeList.contains(type)) {
@@ -816,11 +811,114 @@ public final class ClickHouseDatabaseMetadata implements DatabaseMetaData {
         }
     }
 
+    private ClickHouseDataType convertFromSparkType(String sparkDataType) {
+        switch (sparkDataType) {
+            case "INT":
+                return ClickHouseDataType.Int32;
+            case "DOUBLE":
+                return ClickHouseDataType.Float64;
+            case "TIMESTAMP":
+                return ClickHouseDataType.DateTime;
+            case "LONG":
+                return ClickHouseDataType.Int64;
+            case "SHORT":
+                return ClickHouseDataType.Int16;
+            case "FLOAT":
+                return ClickHouseDataType.Float32;
+            case "DATE":
+                return ClickHouseDataType.Date;
+            case "BOOL":
+                return ClickHouseDataType.UInt8;
+            case "DECIMAL":
+                return ClickHouseDataType.Decimal;
+            case "ARRAY":
+                return ClickHouseDataType.Array;
+            case "STRING":
+            default:
+                return ClickHouseDataType.String;
+        }
+    }
+
+    private ResultSet getColumnsForTable(String schema,
+                                         String tableName) throws SQLException {
+        String query = "DESCRIBE " + ClickHouseUtil.quoteIdentifier(tableName);
+
+        ClickHouseResultBuilder builder = getClickHouseResultBuilderForGetColumns();
+        ResultSet descTable = request(query);
+        int colNum = 1;
+        while (descTable.next()) {
+            List<String> row = new ArrayList<>();
+            //catalog name
+            row.add(DEFAULT_CAT);
+            //database name
+            row.add(schema);
+            //table name
+            row.add(tableName);
+            //column name
+            row.add(descTable.getString("name"));
+            ClickHouseDataType columnDataType = convertFromSparkType(descTable.getString("type"));
+            //data type
+            row.add(String.valueOf(columnDataType.getSqlType()));
+            //type name
+            row.add(columnDataType.name());
+            // column size / precision
+            row.add("0");
+            //buffer length
+            row.add("0");
+            // decimal digits
+            row.add("0");
+            // radix
+            row.add("10");
+            // nullable
+            row.add(String.valueOf(columnNullable));
+            //remarks
+            row.add(null);
+
+            // COLUMN_DEF
+            row.add(null);
+
+            //"SQL_DATA_TYPE", unused per JavaDoc
+            row.add(null);
+            //"SQL_DATETIME_SUB", unused per JavaDoc
+            row.add(null);
+
+            // char octet length
+            row.add("0");
+            // ordinal
+            row.add(String.valueOf(colNum));
+            colNum += 1;
+
+            //IS_NULLABLE
+            row.add("YES");
+            //"SCOPE_CATALOG",
+            row.add(null);
+            //"SCOPE_SCHEMA",
+            row.add(null);
+            //"SCOPE_TABLE",
+            row.add(null);
+            //"SOURCE_DATA_TYPE",
+            row.add(null);
+            //"IS_AUTOINCREMENT"
+            row.add("NO");
+            //"IS_GENERATEDCOLUMN"
+            row.add("NO");
+
+            builder.addRow(row);
+        }
+        descTable.close();
+        return builder.build();
+    }
+
     @Override
     public ResultSet getColumns(String catalog,
                                 String schemaPattern,
                                 String tableNamePattern,
                                 String columnNamePattern) throws SQLException {
+        // if tableNamePattern is not empty
+        if (tableNamePattern != null && !tableNamePattern.isEmpty()) {
+            return getColumnsForTable(schemaPattern, tableNamePattern);
+        }
+
         StringBuilder query;
         if (connection.getServerVersion().compareTo("1.1.54237") > 0) {
             query = new StringBuilder(
