@@ -716,6 +716,9 @@ public final class ClickHouseDatabaseMetadata implements DatabaseMetaData {
          are created. Values are "SYSTEM", "USER", "DERIVED". (may be null)
          */
         String sql = "show tables";
+        if (tableNamePattern != null && !tableNamePattern.isEmpty()) {
+            sql = sql + " LIKE '" + tableNamePattern + "'";
+        }
         ResultSet result = request(sql);
 
         ClickHouseResultBuilder builder = ClickHouseResultBuilder.builder(10);
