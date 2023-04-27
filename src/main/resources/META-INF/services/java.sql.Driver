@@ -1,1 +1,1 @@
-cc.blynk.clickhouse.ClickHouseDriver
+com.guandata.sql.GuandataDriver

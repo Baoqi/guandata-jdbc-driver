@@ -111,13 +111,13 @@ if (rs.next()) {
 
 All you need to do is replace:
 
-`ru.yandex.clickhouse.ClickHouseDriver` to `cc.blynk.clickhouse.ClickHouseDriver`
+`ru.yandex.clickhouse.ClickHouseDriver` to `com.guandata.sql.GuandataDriver`
 
 URL syntax: 
-`jdbc:clickhouse://<host>:<port>[/<database>]`, e.g. `jdbc:clickhouse://localhost:8123/test`
+`jdbc:clickhouse://<host>:<port>[/<database>]`, e.g. `jdbc:guandata://localhost:8123/test`
 
 JDBC Driver Class:
-`cc.blynk.clickhouse.ClickHouseDriver`
+`com.guandata.sql.GuandataDriver`
 
 additionally, if you have a few instances, you can use `BalancedClickhouseDataSource`.
 

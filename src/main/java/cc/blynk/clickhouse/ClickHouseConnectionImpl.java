@@ -48,7 +48,7 @@ public final class ClickHouseConnectionImpl implements ClickHouseConnection {
     private TimeZone timezone;
     private volatile String serverVersion;
 
-    ClickHouseConnectionImpl(HttpConnector httpConnector,
+    public ClickHouseConnectionImpl(HttpConnector httpConnector,
                              String url,
                              ClickHouseProperties properties) {
         this.url = url;

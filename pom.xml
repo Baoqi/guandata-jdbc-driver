@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>cc.blynk.clickhouse</groupId>
-    <artifactId>clickhouse4j</artifactId>
-    <version>1.4.5-SNAPSHOT</version>
+    <groupId>com.guandata.sql</groupId>
+    <artifactId>guandata-jdbc</artifactId>
+    <version>2.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>clickhouse4j</name>
-    <description>Light and fast JDBC driver for ClickHouse</description>
-    <url>https://github.com/blynkkk/clickhouse4j.git</url>
+    <name>guandata-jdbc</name>
+    <description>Light and fast JDBC driver for Guandata</description>
+    <url>https://github.com/GuandataOSS/guandata-jdbc.git</url>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -16,40 +16,6 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    <scm>
-        <url>https://github.com/blynkkk/clickhouse4j.git</url>
-        <connection>scm:git:git@github.com:blynkkk/clickhouse4j.git</connection>
-        <developerConnection>scm:git:git@github.com:blynkkk/clickhouse4j.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
-
-    <developers>
-        <developer>
-            <id>doom369</id>
-            <name>Dmitriy Dumanskiy</name>
-            <email>dmitriy@blynk.cc</email>
-        </developer>
-        <developer>
-            <id>dmitriy-sych</id>
-            <name>Dmitriy Sych</name>
-            <email>forsaken@owl.net.ua</email>
-        </developer>
-        <developer>
-            <id>serebrserg</id>
-            <name>Sergey Serebryanik</name>
-            <email>serebrserg@yandex-team.ru</email>
-        </developer>
-        <developer>
-            <id>jkee</id>
-            <name>Viktor Tarnavsky</name>
-            <email>jkee@yandex-team.ru</email>
-        </developer>
-        <developer>
-            <id>orantius</id>
-            <name>Yuriy Galitskiy</name>
-            <email>orantius@yandex-team.ru</email>
-        </developer>
-    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -143,16 +109,6 @@
         </dependency>
     </dependencies>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 
     <build>
         <plugins>
@@ -313,24 +269,6 @@
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>${maven-release-plugin.version}</version>
-                <configuration>
-                    <localCheckout>true</localCheckout>
-                    <pushChanges>false</pushChanges>
-                    <mavenExecutorId>forked-path</mavenExecutorId>
-                    <arguments>-Dgpg.passphrase=${gpg.passphrase}</arguments>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.scm</groupId>
-                        <artifactId>maven-scm-provider-gitexe</artifactId>
-                        <version>${maven-scm-provider-gitexe.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
 
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>

@@ -2,6 +2,7 @@ package cc.blynk.clickhouse;
 
 import cc.blynk.clickhouse.http.HttpConnectorFactory;
 import cc.blynk.clickhouse.settings.ClickHouseProperties;
+import com.guandata.sql.GuandataDriver;
 
 import javax.sql.DataSource;
 import java.io.Closeable;
@@ -42,12 +43,12 @@ public final class ClickHouseDataSource implements DataSource, Closeable {
 
     @Override
     public ClickHouseConnection getConnection() throws SQLException {
-        return ClickHouseDriver.driver.connect(url, properties);
+        return GuandataDriver.driver.connect(url, properties);
     }
 
     @Override
     public ClickHouseConnection getConnection(String username, String password) throws SQLException {
-        return ClickHouseDriver.driver.connect(url, properties.withCredentials(username, password));
+        return GuandataDriver.driver.connect(url, properties.withCredentials(username, password));
     }
 
     public String getHost() {

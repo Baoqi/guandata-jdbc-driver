@@ -1,6 +1,7 @@
 package cc.blynk.clickhouse;
 
 import cc.blynk.clickhouse.settings.ClickHouseProperties;
+import com.guandata.sql.GuandataDriver;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
@@ -42,7 +43,7 @@ public final class BalancedClickhouseDataSource implements DataSource {
     private volatile List<String> enabledUrls;
 
     private final ClickHouseProperties properties;
-    private final ClickHouseDriver driver = new ClickHouseDriver();
+    private final GuandataDriver driver = new GuandataDriver();
 
     /**
      * create Datasource for clickhouse JDBC connections
