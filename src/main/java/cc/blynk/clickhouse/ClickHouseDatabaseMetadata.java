@@ -745,8 +745,7 @@ public final class ClickHouseDatabaseMetadata implements DatabaseMetaData {
             }
              */
             row.add(type);
-            row.add(result.getString(2));
-            for (int i = 4; i < 9; i++) {
+            for (int i = 3; i < 9; i++) {
                 row.add(null);
             }
             if (typeList == null || typeList.contains(type)) {
